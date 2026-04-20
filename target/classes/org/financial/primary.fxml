@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.financial.PrimaryController" styleClass="app-root">
+    <left>
+        <VBox spacing="10" styleClass="sidebar-minimal">
+            <padding>
+                <Insets top="16" right="10" bottom="16" left="10"/>
+            </padding>
+            <Button fx:id="navProfileBtn" text="👤 Profile" onAction="#onShowProfile" styleClass="sidebar-link"/>
+            <Button fx:id="navTemplateBtn" text="🎨 Template" onAction="#onShowTemplate" styleClass="sidebar-link"/>
+            <Button fx:id="navDataEntryBtn" text="📝 Entry" onAction="#onShowDataEntry" styleClass="sidebar-link"/>
+            <Button fx:id="navSettingsBtn" text="⚙ Settings" onAction="#onShowSettings" styleClass="sidebar-link"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="14" styleClass="main-wrap">
+            <padding>
+                <Insets top="14" right="18" bottom="14" left="18"/>
+            </padding>
+
+            <VBox spacing="4">
+                <Label text="ID Generator" styleClass="title"/>
+                <Label fx:id="instructionLabel" text="Set up your profile first." styleClass="subtitle"/>
+                <Label fx:id="statusLabel" text="" wrapText="true" visible="false" managed="false" styleClass="status"/>
+            </VBox>
+
+            <StackPane fx:id="contentStack">
+                <VBox fx:id="profilePane" spacing="12" styleClass="content-pane" visible="false" managed="false">
+                    <VBox spacing="10" styleClass="section-box">
+                        <Label text="Profile Setup" styleClass="section-title"/>
+                        <Label text="Fill in once. Used for ID prefixes and organization metadata." wrapText="true" styleClass="hint"/>
+
+                        <VBox spacing="12">
+                            <VBox spacing="4">
+                                <Label text="Organization Name" styleClass="field-label"/>
+                                <TextField fx:id="organizationName" promptText="Example: Global Logistics Group"/>
+                            </VBox>
+                            <VBox spacing="4">
+                                <Label text="Organization Type" styleClass="field-label"/>
+                                <TextField fx:id="organizationType" promptText="Company / School / Agency"/>
+                            </VBox>
+                            <VBox spacing="4">
+                                <Label text="ID Prefix" styleClass="field-label"/>
+                                <TextField fx:id="idPrefix" promptText="Example: GLG"/>
+                            </VBox>
+                        </VBox>
+                    </VBox>
+                </VBox>
+
+                <VBox fx:id="settingsPane" spacing="12" styleClass="content-pane" visible="false" managed="false">
+                    <VBox spacing="10" styleClass="section-box">
+                        <Label text="Database" styleClass="section-title"/>
+                        <Label text="Backup or restore all local ID data (SQLite). Works fully offline. Organization name, type, and ID prefix (Profile) live in system preferences and are not part of this file."
+                               wrapText="true" styleClass="hint"/>
+                        <HBox spacing="10">
+                            <Button fx:id="exportDatabaseBtn" text="Export Database…" onAction="#onExportDatabase" styleClass="secondary-button"/>
+                            <Button fx:id="importDatabaseBtn" text="Import Database…" onAction="#onImportDatabase" styleClass="secondary-button"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <ScrollPane fx:id="dataEntryPane" fitToWidth="true" visible="false" managed="false" styleClass="clean-scroll">
+                    <VBox spacing="14" styleClass="content-pane">
+                        <VBox spacing="12" styleClass="section-box">
+                            <Label text="Entry" styleClass="section-title"/>
+                            <HBox spacing="18" alignment="TOP_LEFT">
+                                <VBox spacing="8" prefWidth="190">
+                                    <Label text="Profile Photo" styleClass="field-label"/>
+                                    <ImageView fx:id="photoPreview" fitWidth="120" fitHeight="150" preserveRatio="true" pickOnBounds="true" styleClass="photo-preview"/>
+                                    <Button text="Browse Photo" onAction="#onBrowsePhoto" styleClass="secondary-button"/>
+                                    <Button text="Clear Photo" onAction="#onClearPhoto" styleClass="secondary-button"/>
+                                </VBox>
+                                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                    <TabPane styleClass="entry-tab-pane" tabClosingPolicy="UNAVAILABLE">
+                                        <tabs>
+                                            <Tab text="Front of ID">
+                                                <content>
+                                                    <VBox spacing="10" styleClass="entry-tab-content">
+                                                        <VBox spacing="4">
+                                                            <Label text="Full Name" styleClass="field-label"/>
+                                                            <TextField fx:id="name" promptText="Full Name"/>
+                                                        </VBox>
+                                                        <VBox spacing="4">
+                                                            <Label text="Unique Identifier" styleClass="field-label"/>
+                                                            <HBox spacing="8">
+                                                                <TextField fx:id="idNumber" promptText="Unique ID / Member Number" HBox.hgrow="ALWAYS"/>
+                                                                <Button text="Generate Identifier" onAction="#onGenerateIdentifier" styleClass="primary-button"/>
+                                                            </HBox>
+                                                        </VBox>
+                                                        <VBox fx:id="customFieldsFrontInputsBox" spacing="8"/>
+                                                    </VBox>
+                                                </content>
+                                            </Tab>
+                                            <Tab text="Back of ID">
+                                                <content>
+                                                    <VBox spacing="10" styleClass="entry-tab-content">
+                                                        <Label fx:id="customBackHintLabel"
+                                                               text="Back of the ID has no custom fields yet. Add fields in the Field Manager, then assign them to Back."
+                                                               wrapText="true" styleClass="hint"/>
+                                                        <VBox fx:id="customFieldsBackInputsBox" spacing="8"/>
+                                                    </VBox>
+                                                </content>
+                                            </Tab>
+                                        </tabs>
+                                    </TabPane>
+                                </VBox>
+                            </HBox>
+
+                            <Separator/>
+
+                            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="entry-action-row">
+                                <Button text="Save Record" onAction="#onSave" styleClass="primary-button"/>
+                            </HBox>
+                        </VBox>
+
+                        <TitledPane text="Saved Records" expanded="true" styleClass="records-pane">
+                            <content>
+                                <VBox spacing="10" styleClass="records-body">
+                                    <HBox spacing="8" alignment="CENTER_LEFT">
+                                        <ToggleButton fx:id="recordsActionToggle" text="Select"/>
+                                        <CheckBox fx:id="selectAllRecordsCheck" text="All" visible="false" managed="false"/>
+                                        <TextField fx:id="recordSearchField" promptText="Search by name or identifier..." HBox.hgrow="ALWAYS"/>
+                                        <ComboBox fx:id="recordFilterCombo" prefWidth="150"/>
+
+                                        <Button text="👁" onAction="#onPreviewGenerate" styleClass="table-action-icon">
+                                            <tooltip><Tooltip text="Preview / Generate selected"/></tooltip>
+                                        </Button>
+                                        <Button text="⬇" onAction="#onExportAllAsImages" styleClass="table-action-icon">
+                                            <tooltip><Tooltip text="Export all"/></tooltip>
+                                        </Button>
+                                        <Button text="🗑" onAction="#onDeleteSelected" styleClass="table-action-icon danger-icon">
+                                            <tooltip><Tooltip text="Delete selected"/></tooltip>
+                                        </Button>
+
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Separator orientation="VERTICAL"/>
+
+                                        <Button text="📂" onAction="#onBrowseExcel" styleClass="table-action-icon">
+                                            <tooltip><Tooltip text="Browse Excel (.xlsx)"/></tooltip>
+                                        </Button>
+                                        <Button text="⤓" onAction="#onImportExcel" styleClass="table-action-icon">
+                                            <tooltip><Tooltip text="Import valid rows"/></tooltip>
+                                        </Button>
+                                        <Button text="📄" onAction="#onDownloadExcelTemplate" styleClass="table-action-icon">
+                                            <tooltip><Tooltip text="Download Excel template"/></tooltip>
+                                        </Button>
+                                    </HBox>
+                                    <TableView fx:id="idTable" VBox.vgrow="ALWAYS" prefHeight="220">
+                                        <placeholder>
+                                            <Label text="No records yet. Save a record from above."/>
+                                        </placeholder>
+                                        <columns>
+                                            <TableColumn fx:id="colSelect" text="" prefWidth="44" visible="false"/>
+                                            <TableColumn fx:id="colName" text="Name" prefWidth="300"/>
+                                            <TableColumn fx:id="colIdNumber" text="Identifier" prefWidth="220"/>
+                                            <TableColumn fx:id="colActions" text="Actions" prefWidth="110"/>
+                                        </columns>
+                                    </TableView>
+                                    <TextArea fx:id="excelImportLog" prefRowCount="3" wrapText="true" promptText="Excel import messages appear here."/>
+                                </VBox>
+                            </content>
+                        </TitledPane>
+                    </VBox>
+                </ScrollPane>
+
+                <VBox fx:id="templatePane" spacing="12" styleClass="content-pane" visible="false" managed="false">
+                    <VBox spacing="8" styleClass="section-box">
+                        <Label text="Field Manager" styleClass="section-title"/>
+                        <Label text="Add, rename, remove, and assign additional fields to front/back. Full Name and Unique Identifier are always available." wrapText="true" styleClass="hint"/>
+                        <ListView fx:id="customFieldList" prefHeight="140"/>
+                        <VBox spacing="6">
+                            <Label text="Field Name" styleClass="field-label"/>
+                            <TextField fx:id="customFieldNameInput" promptText="e.g., Blood Type"/>
+                        </VBox>
+                        <HBox spacing="10">
+                            <CheckBox fx:id="customFieldFrontCheck" text="Show on Front"/>
+                            <CheckBox fx:id="customFieldBackCheck" text="Show on Back"/>
+                        </HBox>
+                        <HBox spacing="8">
+                            <Button text="Add Field" onAction="#onAddCustomField" styleClass="secondary-button"/>
+                            <Button text="Update Selected" onAction="#onUpdateCustomField" styleClass="secondary-button"/>
+                            <Button text="Delete Selected" onAction="#onDeleteCustomField" styleClass="danger-button"/>
+                        </HBox>
+                    </VBox>
+                    <VBox spacing="8" styleClass="section-box">
+                        <Label text="Template Layout" styleClass="section-title"/>
+                        <Label text="Set front/back template images, then define field placement." wrapText="true" styleClass="hint"/>
+                        <HBox spacing="16" alignment="CENTER_LEFT">
+                            <VBox spacing="6">
+                                <Label text="Front Template" styleClass="field-label"/>
+                                <ImageView fx:id="referenceFrontPreview" fitWidth="160" fitHeight="100" preserveRatio="true" styleClass="photo-preview"/>
+                                <Button text="Set Front" onAction="#onSetReferenceFront" styleClass="secondary-button"/>
+                            </VBox>
+                            <VBox spacing="6">
+                                <Label text="Back Template" styleClass="field-label"/>
+                                <ImageView fx:id="referenceBackPreview" fitWidth="160" fitHeight="100" preserveRatio="true" styleClass="photo-preview"/>
+                                <Button text="Set Back" onAction="#onSetReferenceBack" styleClass="secondary-button"/>
+                            </VBox>
+                        </HBox>
+                        <Separator/>
+                        <Button text="Define Layout" onAction="#onDefineLayout" styleClass="primary-button"/>
+                    </VBox>
+                </VBox>
+            </StackPane>
+        </VBox>
+    </center>
+</BorderPane>

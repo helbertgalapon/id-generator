@@ -1,0 +1,5 @@
+{
+  "projectId": "YOUR_FIREBASE_PROJECT_ID",
+  "apiKey": "YOUR_WEB_API_KEY",
+  "databaseUrl": ""
+}

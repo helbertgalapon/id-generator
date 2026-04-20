@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.financial.TemplateDesignerController"
+            styleClass="app-root template-designer-root">
+    <padding><Insets bottom="12" left="12" right="12" top="12"/></padding>
+    <top>
+        <VBox spacing="12" styleClass="section-box toolbar-shell">
+            <Label text="Define template layout" styleClass="title"/>
+            <Label fx:id="hintLabel" text="Drag fields onto the canvas. Shift+click: multi-select. Handles: resize. Space+drag: pan. Wheel: zoom. Ctrl+Z / Ctrl+Y: undo &amp; redo." wrapText="true" styleClass="hint"/>
+
+            <HBox spacing="12" alignment="CENTER_LEFT" styleClass="toolbar-row toolbar-row-primary">
+                <VBox spacing="6" styleClass="toolbar-group">
+                    <Label text="Layout" styleClass="toolbar-group-title"/>
+                    <HBox spacing="8">
+                        <Button text="Save layout" onAction="#onSaveLayout" styleClass="primary-button"/>
+                        <Button text="Undo" onAction="#onUndo" styleClass="secondary-button"/>
+                        <Button text="Redo" onAction="#onRedo" styleClass="secondary-button"/>
+                    </HBox>
+                </VBox>
+                <Separator orientation="VERTICAL"/>
+                <VBox spacing="6" styleClass="toolbar-group">
+                    <Label text="Editing" styleClass="toolbar-group-title"/>
+                    <HBox spacing="8">
+                        <Button text="Duplicate" onAction="#onDuplicateSelected" styleClass="secondary-button"/>
+                        <Button text="Delete" onAction="#onDeleteSelected" styleClass="danger-button"/>
+                        <Button text="Refresh layout" onAction="#onRefreshLayout" styleClass="secondary-button"/>
+                        <Button text="Change background…" onAction="#onChangeBackground" styleClass="secondary-button"/>
+                        <Button text="Close" onAction="#onClose" styleClass="secondary-button"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="12" styleClass="toolbar-row">
+                <VBox spacing="6" HBox.hgrow="ALWAYS" styleClass="toolbar-group toolbar-group-grow">
+                    <Label text="View" styleClass="toolbar-group-title"/>
+                    <HBox spacing="8" styleClass="toolbar-wrap">
+                        <Label text="Side" styleClass="form-inline-label"/>
+                        <ComboBox fx:id="sideCombo" prefWidth="110"/>
+                        <Separator orientation="VERTICAL"/>
+                        <Button text="−" onAction="#onZoomOut" styleClass="secondary-button zoom-tight"/>
+                        <Button text="+" onAction="#onZoomIn" styleClass="secondary-button zoom-tight"/>
+                        <Button text="100%" onAction="#onZoomFit" styleClass="secondary-button"/>
+                        <Separator orientation="VERTICAL"/>
+                        <CheckBox fx:id="snapGridCheck" text="Snap grid"/>
+                        <CheckBox fx:id="showLabelsCheck" text="Debug overlays"/>
+                        <CheckBox fx:id="bgLockCheck" text="Lock background"/>
+                    </HBox>
+                </VBox>
+                <VBox spacing="6" styleClass="toolbar-group">
+                    <Label text="Align selection (2+)" styleClass="toolbar-group-title"/>
+                    <HBox spacing="6" styleClass="toolbar-wrap">
+                        <Button text="Left" onAction="#onAlignLeft" styleClass="secondary-button align-compact"/>
+                        <Button text="Center" onAction="#onAlignCenter" styleClass="secondary-button align-compact"/>
+                        <Button text="Right" onAction="#onAlignRight" styleClass="secondary-button align-compact"/>
+                        <Separator orientation="VERTICAL"/>
+                        <Button text="Dist H" onAction="#onDistributeHorizontal" styleClass="secondary-button align-compact"/>
+                        <Button text="Dist V" onAction="#onDistributeVertical" styleClass="secondary-button align-compact"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+        </VBox>
+    </top>
+
+    <left>
+        <VBox spacing="10" styleClass="section-box fields-panel" prefWidth="220">
+            <Label text="Fields" styleClass="section-title"/>
+            <Label text="Drag a field onto the canvas to place it." styleClass="panel-subtitle" wrapText="true"/>
+            <ListView fx:id="fieldList" prefHeight="520" VBox.vgrow="ALWAYS" styleClass="field-list"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox fx:id="centerPanel" spacing="10" styleClass="section-box center-panel">
+            <Label fx:id="canvasLabel" text="Card preview (matches export at 100% zoom)" styleClass="section-title canvas-title"/>
+            <ScrollPane fx:id="canvasScroll" fitToWidth="true" fitToHeight="true" pannable="false" VBox.vgrow="ALWAYS" styleClass="canvas-scroll">
+                <content>
+                    <AnchorPane fx:id="canvasHost" minWidth="980" minHeight="700" styleClass="canvas-host">
+                        <children>
+                            <Canvas fx:id="templateCanvas" width="760" height="520" AnchorPane.leftAnchor="48.0" AnchorPane.topAnchor="48.0"/>
+                            <HBox fx:id="miniToolbar" styleClass="mini-toolbar" spacing="8" visible="false" managed="false" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <Label text="Size" styleClass="mini-toolbar-label"/>
+                                <TextField fx:id="miniFontSize" prefWidth="52"/>
+                                <CheckBox fx:id="miniBold" text="Bold"/>
+                                <ComboBox fx:id="miniAlign" prefWidth="88"/>
+                            </HBox>
+                        </children>
+                    </AnchorPane>
+                </content>
+            </ScrollPane>
+        </VBox>
+    </center>
+
+    <right>
+        <VBox fx:id="propsPanel" spacing="12" styleClass="section-box props-panel" prefWidth="288">
+            <Label text="Properties" styleClass="section-title"/>
+
+            <VBox spacing="8" styleClass="props-section">
+                <Label text="Position &amp; size (px)" styleClass="props-section-title"/>
+                <HBox spacing="10">
+                    <VBox spacing="4" styleClass="form-field" HBox.hgrow="ALWAYS">
+                        <Label text="X" styleClass="form-label"/>
+                        <TextField fx:id="propX" onAction="#onApplyProperties"/>
+                    </VBox>
+                    <VBox spacing="4" styleClass="form-field" HBox.hgrow="ALWAYS">
+                        <Label text="Y" styleClass="form-label"/>
+                        <TextField fx:id="propY" onAction="#onApplyProperties"/>
+                    </VBox>
+                </HBox>
+                <HBox spacing="10">
+                    <VBox spacing="4" styleClass="form-field" HBox.hgrow="ALWAYS">
+                        <Label text="W" styleClass="form-label"/>
+                        <TextField fx:id="propW" onAction="#onApplyProperties"/>
+                    </VBox>
+                    <VBox spacing="4" styleClass="form-field" HBox.hgrow="ALWAYS">
+                        <Label text="H" styleClass="form-label"/>
+                        <TextField fx:id="propH" onAction="#onApplyProperties"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <VBox spacing="8" styleClass="props-section">
+                <Label text="Typography" styleClass="props-section-title"/>
+                <VBox spacing="4" styleClass="form-field">
+                    <Label text="Scale (12 = default hierarchy)" styleClass="form-label"/>
+                    <TextField fx:id="propFontSize"/>
+                </VBox>
+                <HBox spacing="10">
+                    <VBox spacing="4" styleClass="form-field" HBox.hgrow="ALWAYS">
+                        <Label text="Weight" styleClass="form-label"/>
+                        <ComboBox fx:id="propFontWeight"/>
+                    </VBox>
+                    <VBox spacing="4" styleClass="form-field" HBox.hgrow="ALWAYS">
+                        <Label text="Align" styleClass="form-label"/>
+                        <ComboBox fx:id="propTextAlign"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <VBox spacing="8" styleClass="props-section">
+                <Label text="Behavior" styleClass="props-section-title"/>
+                <VBox spacing="8">
+                    <CheckBox fx:id="propLocked" text="Locked" onAction="#onPropertyLockChanged"/>
+                    <CheckBox fx:id="propVisible" text="Visible"/>
+                </VBox>
+            </VBox>
+
+            <VBox fx:id="propsPhotoShapeSection" spacing="8" styleClass="props-section" managed="false" visible="false">
+                <Label text="Photo" styleClass="props-section-title"/>
+                <VBox spacing="4" styleClass="form-field">
+                    <Label text="Shape" styleClass="form-label"/>
+                    <ComboBox fx:id="propPhotoShape" prefWidth="200"/>
+                </VBox>
+            </VBox>
+
+            <VBox spacing="8" styleClass="props-section">
+                <Label text="Layers" styleClass="props-section-title"/>
+                <ListView fx:id="layerList" prefHeight="172" styleClass="layer-list"/>
+                <HBox spacing="8" styleClass="layer-actions">
+                    <Button text="To back" onAction="#onSendToBack" styleClass="secondary-button"/>
+                    <Button text="Down" onAction="#onSendBackward" styleClass="secondary-button"/>
+                    <Button text="Up" onAction="#onBringForward" styleClass="secondary-button"/>
+                    <Button text="To front" onAction="#onBringToFront" styleClass="secondary-button"/>
+                </HBox>
+            </VBox>
+
+            <Button text="Apply" onAction="#onApplyProperties" styleClass="primary-button apply-button"/>
+        </VBox>
+    </right>
+</BorderPane>
